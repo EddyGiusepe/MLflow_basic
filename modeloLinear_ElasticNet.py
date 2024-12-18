@@ -7,8 +7,6 @@ Machine Learning: Modelo Linear com ElasticNet para prever a qualidade do vinho
 Este script serve para prever a qualidade de vinhos e para isso, utiliza o modelo ElasticNet.
 
 
-
-
 The data set used in this example is from http://archive.ics.uci.edu/ml/datasets/Wine+Quality
 P. Cortez, A. Cerdeira, F. Almeida, T. Matos and J. Reis.
 Modeling wine preferences by data mining from physicochemical properties. In Decision Support Systems, Elsevier, 47(4):547-553, 2009.
@@ -27,6 +25,7 @@ import mlflow
 from mlflow.models.signature import infer_signature
 import mlflow.sklearn
 import argparse
+import dagshub
 
 import logging
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
@@ -37,8 +36,6 @@ MAGENTA = "\033[95m"
 YELLOW = "\033[93m"
 BLUE = "\033[94m"
 RESET = "\033[0m"
-
-
 
 
 def eval_metrics(actual, pred):
@@ -90,9 +87,12 @@ if __name__ == "__main__":
     args = parser.parse_args()
 
     # Usar os valores:
+    logging.info(f"{GREEN}Usando os seguintes Hiperparâmetros: {RESET}")
     print(f"Alpha: {args.alpha}, L1 Ratio: {args.l1_ratio}")
 
-
+    # Usando MLflow tracking para o Dagshub:
+    logging.info(f"{RED}Usando o Dagshub para o MLflow tracking{RESET}")
+    dagshub.init(repo_owner='EddyGiusepe', repo_name='MLflow_basic', mlflow=True)
 
     with mlflow.start_run():
         lr = ElasticNet(alpha=args.alpha, l1_ratio=args.l1_ratio, random_state=42)
@@ -102,6 +102,7 @@ if __name__ == "__main__":
 
         (rmse, mae, r2) = eval_metrics(test_y, predicted_qualities)
 
+        logging.info(f"{GREEN}Hiperparâmetros e resultados do modelo ElasticNet: {RESET}")
         print("Elasticnet model (alpha={:f}, l1_ratio={:f}):".format(args.alpha, args.l1_ratio))
         print("  RMSE: %s" % rmse)
         print("  MAE: %s" % mae)
