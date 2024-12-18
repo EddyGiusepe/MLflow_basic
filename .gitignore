@@ -164,3 +164,4 @@ cython_debug/
 
 # EddyGiusepe
 venv_mlflow_basic/
+mlruns/
